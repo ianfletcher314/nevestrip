@@ -43,8 +43,8 @@ public:
     juce::AudioProcessorValueTreeState& getAPVTS() { return apvts; }
 
     // Metering
-    float getInputLevel() const { return inputLevel.load(); }
-    float getOutputLevel() const { return outputLevel.load(); }
+    float getInputLevel() const { return inputLevelMeter.load(); }
+    float getOutputLevel() const { return outputLevelMeter.load(); }
     float getCompressorGR() const { return compressor.getGainReduction(); }
     float getLimiterGR() const { return limiter.getGainReduction(); }
 
@@ -96,7 +96,7 @@ private:
     std::atomic<float>* masterBypass = nullptr;
 
     // Metering
-    std::atomic<float> inputLevel { 0.0f };
+    std::atomic<float> inputLevelMeter { 0.0f };
     std::atomic<float> outputLevelMeter { 0.0f };
 
     // Smoothed parameters

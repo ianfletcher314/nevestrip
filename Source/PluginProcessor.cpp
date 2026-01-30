@@ -241,7 +241,7 @@ void NeveStripAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     float inLevel = 0.0f;
     for (int ch = 0; ch < totalNumInputChannels; ++ch)
         inLevel = std::max(inLevel, buffer.getMagnitude(ch, 0, numSamples));
-    inputLevel.store(inLevel);
+    inputLevelMeter.store(inLevel);
 
     // === PREAMP SECTION ===
 

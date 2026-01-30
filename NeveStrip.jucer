@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="NEVES01" name="NeveStrip" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
-              companyName="Compstortion" companyCopyright="2024"
-              companyWebsite="https://github.com/ianfletcher314/nevestrip"
-              pluginFormats="buildAU,buildVST3"
-              pluginCharacteristicsValue=""
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Compstortion"
+              companyCopyright="2024" companyWebsite="https://github.com/ianfletcher314/nevestrip"
+              pluginFormats="buildAU,buildVST3" pluginCharacteristicsValue=""
               pluginName="NeveStrip" pluginDesc="Neve-style channel strip plugin"
               pluginManufacturer="Compstortion" pluginManufacturerCode="Cmps"
-              pluginCode="Neve" pluginVST3Category="Fx"
-              pluginAUMainType="'aufx'">
+              pluginCode="Neve" pluginVST3Category="Fx" pluginAUMainType="'aufx'">
   <MAINGROUP id="MAINGRP" name="NeveStrip">
     <GROUP id="SOURCE" name="Source">
       <FILE id="PROCSR" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -18,29 +15,20 @@
             file="Source/PluginProcessor.h"/>
       <FILE id="EDITOR" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
-      <FILE id="EDITORH" name="PluginEditor.h" compile="0" resource="0"
-            file="Source/PluginEditor.h"/>
+      <FILE id="EDITORH" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <GROUP id="DSP" name="DSP">
-        <FILE id="DSPUTILS" name="DSPUtils.h" compile="0" resource="0"
-              file="Source/DSP/DSPUtils.h"/>
-        <FILE id="TRANSH" name="Transformer.h" compile="0" resource="0"
-              file="Source/DSP/Transformer.h"/>
+        <FILE id="DSPUTILS" name="DSPUtils.h" compile="0" resource="0" file="Source/DSP/DSPUtils.h"/>
+        <FILE id="TRANSH" name="Transformer.h" compile="0" resource="0" file="Source/DSP/Transformer.h"/>
         <FILE id="TRANSCPP" name="Transformer.cpp" compile="1" resource="0"
               file="Source/DSP/Transformer.cpp"/>
-        <FILE id="EQH" name="NeveEQ.h" compile="0" resource="0"
-              file="Source/DSP/NeveEQ.h"/>
-        <FILE id="EQCPP" name="NeveEQ.cpp" compile="1" resource="0"
-              file="Source/DSP/NeveEQ.cpp"/>
-        <FILE id="COMPH" name="NeveCompressor.h" compile="0" resource="0"
-              file="Source/DSP/NeveCompressor.h"/>
+        <FILE id="EQH" name="NeveEQ.h" compile="0" resource="0" file="Source/DSP/NeveEQ.h"/>
+        <FILE id="EQCPP" name="NeveEQ.cpp" compile="1" resource="0" file="Source/DSP/NeveEQ.cpp"/>
+        <FILE id="COMPH" name="NeveCompressor.h" compile="0" resource="0" file="Source/DSP/NeveCompressor.h"/>
         <FILE id="COMPCPP" name="NeveCompressor.cpp" compile="1" resource="0"
               file="Source/DSP/NeveCompressor.cpp"/>
-        <FILE id="LIMH" name="NeveLimiter.h" compile="0" resource="0"
-              file="Source/DSP/NeveLimiter.h"/>
-        <FILE id="LIMCPP" name="NeveLimiter.cpp" compile="1" resource="0"
-              file="Source/DSP/NeveLimiter.cpp"/>
-        <FILE id="HPFH" name="HighPassFilter.h" compile="0" resource="0"
-              file="Source/DSP/HighPassFilter.h"/>
+        <FILE id="LIMH" name="NeveLimiter.h" compile="0" resource="0" file="Source/DSP/NeveLimiter.h"/>
+        <FILE id="LIMCPP" name="NeveLimiter.cpp" compile="1" resource="0" file="Source/DSP/NeveLimiter.cpp"/>
+        <FILE id="HPFH" name="HighPassFilter.h" compile="0" resource="0" file="Source/DSP/HighPassFilter.h"/>
         <FILE id="HPFCPP" name="HighPassFilter.cpp" compile="1" resource="0"
               file="Source/DSP/HighPassFilter.cpp"/>
       </GROUP>
@@ -67,22 +55,26 @@
         <MODULEPATH id="juce_graphics" path="/Users/ianfletcher/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="/Users/ianfletcher/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="/Users/ianfletcher/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
   <MODULES>
-    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
 </JUCERPROJECT>
