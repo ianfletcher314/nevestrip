@@ -1,0 +1,43 @@
+# Build outputs
+Builds/MacOSX/build/
+Builds/MacOSX/DerivedData/
+build/
+
+# Xcode
+*.xcworkspace
+*.xcuserstate
+xcuserdata/
+
+# CMake
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Compiled plugins
+*.component
+*.vst3
+*.vst
+
+# Object files
+*.o
+*.obj
+
+# Debug files
+*.dSYM/
+
+# User-specific files
+*.user
+*.suo
