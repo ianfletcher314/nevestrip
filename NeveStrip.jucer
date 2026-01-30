@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="NEVES01" name="NeveStrip" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Compstortion"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Fletcher"
               companyCopyright="2024" companyWebsite="https://github.com/ianfletcher314/nevestrip"
               pluginFormats="buildAU,buildVST3" pluginCharacteristicsValue=""
               pluginName="NeveStrip" pluginDesc="Neve-style channel strip plugin"
-              pluginManufacturer="Compstortion" pluginManufacturerCode="Cmps"
-              pluginCode="Neve" pluginVST3Category="Fx" pluginAUMainType="'aufx'">
+              pluginManufacturer="Fletcher" pluginManufacturerCode="Flet"
+              pluginCode="Neve" pluginVST3Category="Fx" pluginAUMainType="'aufx'"
+              pluginEditorRequiresKeys="0">
   <MAINGROUP id="MAINGRP" name="NeveStrip">
     <GROUP id="SOURCE" name="Source">
       <FILE id="PROCSR" name="PluginProcessor.cpp" compile="1" resource="0"

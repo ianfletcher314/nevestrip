@@ -4,7 +4,7 @@
 #include "PluginProcessor.h"
 
 //==============================================================================
-// Neve-style LookAndFeel
+// Neve-style LookAndFeel with Chicken Head Knobs
 //==============================================================================
 class NeveLookAndFeel : public juce::LookAndFeel_V4
 {
@@ -27,13 +27,15 @@ public:
     juce::Font getLabelFont(juce::Label& label) override;
 
     void setKnobColour(juce::Colour c) { knobColour = c; }
+    void setIsChickenHead(bool ch) { isChickenHead = ch; }
 
 private:
     juce::Colour knobColour;
+    bool isChickenHead = true;
 };
 
 //==============================================================================
-// VU Meter Component
+// Classic VU Meter Component (Analog Style)
 //==============================================================================
 class VUMeter : public juce::Component
 {
@@ -53,7 +55,7 @@ private:
 };
 
 //==============================================================================
-// Section Header Component
+// Section Header Component (Metal Strip Style)
 //==============================================================================
 class SectionHeader : public juce::Component
 {
@@ -66,7 +68,7 @@ private:
 };
 
 //==============================================================================
-// Main Editor
+// Main Editor - Vertical Channel Strip Layout
 //==============================================================================
 class NeveStripAudioProcessorEditor : public juce::AudioProcessorEditor,
                                        public juce::Timer
@@ -84,22 +86,23 @@ private:
 
     NeveLookAndFeel neveLookAndFeel;
     NeveLookAndFeel orangeKnobLookAndFeel;
+    NeveLookAndFeel redKnobLookAndFeel;
 
-    // === PREAMP SECTION ===
-    SectionHeader preampHeader { "PREAMP" };
+    // === PREAMP/INPUT SECTION (Top) ===
+    SectionHeader preampHeader { "INPUT" };
     juce::Slider inputGainSlider;
     juce::Slider outputTrimSlider;
     juce::Slider transformerDriveSlider;
     juce::ComboBox hpfCombo;
     juce::ToggleButton phaseButton { "Phase" };
 
-    juce::Label inputGainLabel { {}, "INPUT" };
+    juce::Label inputGainLabel { {}, "GAIN" };
     juce::Label outputTrimLabel { {}, "TRIM" };
     juce::Label transformerLabel { {}, "DRIVE" };
     juce::Label hpfLabel { {}, "HPF" };
 
-    // === EQ SECTION ===
-    SectionHeader eqHeader { "EQ" };
+    // === EQ SECTION (Middle) ===
+    SectionHeader eqHeader { "EQUALISER" };
 
     // HF
     juce::ComboBox hfFreqCombo;
@@ -109,20 +112,20 @@ private:
     // HM
     juce::ComboBox hmFreqCombo;
     juce::Slider hmGainSlider;
-    juce::Label hmLabel { {}, "HM" };
+    juce::Label hmLabel { {}, "HI MID" };
 
     // LM
     juce::ComboBox lmFreqCombo;
     juce::Slider lmGainSlider;
-    juce::Label lmLabel { {}, "LM" };
+    juce::Label lmLabel { {}, "LO MID" };
 
     // LF
     juce::ComboBox lfFreqCombo;
     juce::Slider lfGainSlider;
     juce::Label lfLabel { {}, "LF" };
 
-    juce::ToggleButton eqBypassButton { "EQ In" };
-    juce::ToggleButton eqPrePostButton { "Post" };
+    juce::ToggleButton eqBypassButton { "EQ IN" };
+    juce::ToggleButton eqPrePostButton { "PRE" };
 
     // === DYNAMICS SECTION ===
     SectionHeader dynamicsHeader { "DYNAMICS" };
@@ -133,27 +136,27 @@ private:
     juce::ComboBox compReleaseCombo;
     juce::Slider compMakeupSlider;
     juce::ToggleButton compSCHPFButton { "SC HPF" };
-    juce::ToggleButton compLinkButton { "Link" };
-    juce::ToggleButton compBypassButton { "Comp" };
+    juce::ToggleButton compLinkButton { "LINK" };
+    juce::ToggleButton compBypassButton { "COMP" };
 
     juce::Label compThreshLabel { {}, "THRESH" };
     juce::Label compRatioLabel { {}, "RATIO" };
-    juce::Label compAttackLabel { {}, "ATTACK" };
-    juce::Label compReleaseLabel { {}, "RELEASE" };
-    juce::Label compMakeupLabel { {}, "MAKEUP" };
+    juce::Label compAttackLabel { {}, "ATK" };
+    juce::Label compReleaseLabel { {}, "REL" };
+    juce::Label compMakeupLabel { {}, "GAIN" };
 
     // Limiter
     juce::Slider limThresholdSlider;
-    juce::ToggleButton limBypassButton { "Limit" };
+    juce::ToggleButton limBypassButton { "LIMIT" };
     juce::Label limThreshLabel { {}, "LIMIT" };
 
-    // === OUTPUT SECTION ===
+    // === OUTPUT SECTION (Bottom) ===
     SectionHeader outputHeader { "OUTPUT" };
     juce::Slider outputLevelSlider;
     juce::ToggleButton masterBypassButton { "BYPASS" };
-    juce::Label outputLabel { {}, "LEVEL" };
+    juce::Label outputLabel { {}, "OUTPUT" };
 
-    // VU Meters
+    // VU Meters (Side)
     VUMeter inputMeter;
     VUMeter outputMeter;
     VUMeter grMeter;
@@ -196,14 +199,26 @@ private:
 
     void setupSlider(juce::Slider& slider, juce::Label& label);
     void setupComboBox(juce::ComboBox& combo);
+    void drawRackScrew(juce::Graphics& g, int x, int y);
 
-    // Neve colors
-    static constexpr uint32_t neveBlueGrey = 0xFF4A5568;
-    static constexpr uint32_t neveDarkGrey = 0xFF2D3748;
-    static constexpr uint32_t neveOrange = 0xFFED8936;
-    static constexpr uint32_t neveRed = 0xFFE53E3E;
-    static constexpr uint32_t neveCream = 0xFFF7FAFC;
-    static constexpr uint32_t neveGold = 0xFFD69E2E;
+    // Classic Neve Colors
+    static constexpr uint32_t neveBlueGrey = 0xFF5B6B7A;      // Classic blue-grey metal
+    static constexpr uint32_t neveDarkBlue = 0xFF3D4A56;      // Darker accent
+    static constexpr uint32_t neveMetalLight = 0xFF7A8A99;    // Light metal highlight
+    static constexpr uint32_t neveOrange = 0xFFE67E22;        // Classic orange
+    static constexpr uint32_t neveRed = 0xFFCC3333;           // Classic red
+    static constexpr uint32_t neveCream = 0xFFF5F0E6;         // Vintage cream
+    static constexpr uint32_t neveGold = 0xFFD4A84B;          // Gold lettering
+    static constexpr uint32_t neveScrewSilver = 0xFFA0A8B0;   // Screw color
+
+    // Layout constants for vertical strip
+    static constexpr int stripWidth = 340;
+    static constexpr int stripHeight = 780;
+    static constexpr int knobSize = 50;
+    static constexpr int smallKnobSize = 42;
+    static constexpr int labelHeight = 14;
+    static constexpr int sectionPadding = 6;
+    static constexpr int headerHeight = 20;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NeveStripAudioProcessorEditor)
 };

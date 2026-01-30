@@ -1,109 +1,169 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-// NeveLookAndFeel
+// NeveLookAndFeel - Chicken Head Knob Style
 //==============================================================================
 NeveLookAndFeel::NeveLookAndFeel()
 {
-    knobColour = juce::Colour(0xFFF7FAFC);  // Cream by default
+    knobColour = juce::Colour(0xFFF5F0E6);  // Cream by default
+    isChickenHead = true;
 
-    setColour(juce::ComboBox::backgroundColourId, juce::Colour(0xFF2D3748));
-    setColour(juce::ComboBox::textColourId, juce::Colour(0xFFF7FAFC));
-    setColour(juce::ComboBox::outlineColourId, juce::Colour(0xFF4A5568));
-    setColour(juce::ComboBox::arrowColourId, juce::Colour(0xFFF7FAFC));
+    setColour(juce::ComboBox::backgroundColourId, juce::Colour(0xFF3D4A56));
+    setColour(juce::ComboBox::textColourId, juce::Colour(0xFFF5F0E6));
+    setColour(juce::ComboBox::outlineColourId, juce::Colour(0xFF2A3440));
+    setColour(juce::ComboBox::arrowColourId, juce::Colour(0xFFF5F0E6));
 
-    setColour(juce::PopupMenu::backgroundColourId, juce::Colour(0xFF2D3748));
-    setColour(juce::PopupMenu::textColourId, juce::Colour(0xFFF7FAFC));
-    setColour(juce::PopupMenu::highlightedBackgroundColourId, juce::Colour(0xFF4A5568));
+    setColour(juce::PopupMenu::backgroundColourId, juce::Colour(0xFF3D4A56));
+    setColour(juce::PopupMenu::textColourId, juce::Colour(0xFFF5F0E6));
+    setColour(juce::PopupMenu::highlightedBackgroundColourId, juce::Colour(0xFF5B6B7A));
     setColour(juce::PopupMenu::highlightedTextColourId, juce::Colour(0xFFFFFFFF));
 
-    setColour(juce::Label::textColourId, juce::Colour(0xFFF7FAFC));
+    setColour(juce::Label::textColourId, juce::Colour(0xFFF5F0E6));
 }
 
 void NeveLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
                                         float sliderPosProportional, float /*rotaryStartAngle*/,
                                         float /*rotaryEndAngle*/, juce::Slider& /*slider*/)
 {
-    auto bounds = juce::Rectangle<float>((float)x, (float)y, (float)width, (float)height).reduced(4.0f);
+    auto bounds = juce::Rectangle<float>((float)x, (float)y, (float)width, (float)height).reduced(2.0f);
     float cx = bounds.getCentreX();
     float cy = bounds.getCentreY();
-    float radius = juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2.0f - 2.0f;
+    float radius = juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2.0f - 1.0f;
 
-    // Outer ring (knurled edge)
-    g.setColour(juce::Colour(0xFF1A202C));
+    // Shadow underneath
+    g.setColour(juce::Colour(0x40000000));
+    g.fillEllipse(cx - radius + 2, cy - radius + 2, radius * 2.0f, radius * 2.0f);
+
+    // Outer metal ring (bezel)
+    juce::ColourGradient bezelGradient(
+        juce::Colour(0xFF8090A0), cx - radius, cy - radius,
+        juce::Colour(0xFF404850), cx + radius, cy + radius, false);
+    g.setGradientFill(bezelGradient);
     g.fillEllipse(cx - radius, cy - radius, radius * 2.0f, radius * 2.0f);
 
-    // Knurl pattern
-    g.setColour(juce::Colour(0xFF2D3748));
-    int numKnurls = 20;
+    // Knurled edge pattern
+    float knurlRadius = radius - 1.0f;
+    g.setColour(juce::Colour(0xFF303840));
+    int numKnurls = 24;
     for (int i = 0; i < numKnurls; ++i)
     {
         float angle = i * juce::MathConstants<float>::twoPi / numKnurls;
-        float x1 = cx + (radius - 1.0f) * std::cos(angle);
-        float y1 = cy + (radius - 1.0f) * std::sin(angle);
-        float x2 = cx + (radius - 4.0f) * std::cos(angle);
-        float y2 = cy + (radius - 4.0f) * std::sin(angle);
-        g.drawLine(x1, y1, x2, y2, 1.5f);
+        float x1 = cx + knurlRadius * std::cos(angle);
+        float y1 = cy + knurlRadius * std::sin(angle);
+        float x2 = cx + (knurlRadius - 3.0f) * std::cos(angle);
+        float y2 = cy + (knurlRadius - 3.0f) * std::sin(angle);
+        g.drawLine(x1, y1, x2, y2, 1.0f);
     }
 
-    // Main knob body with gradient
-    float innerRadius = radius * 0.75f;
+    // Main knob body with gradient for 3D effect
+    float innerRadius = radius * 0.72f;
     juce::ColourGradient knobGradient(
-        juce::Colour(0xFF4A5568), cx - innerRadius * 0.3f, cy - innerRadius * 0.3f,
-        juce::Colour(0xFF2D3748), cx + innerRadius * 0.3f, cy + innerRadius * 0.3f, true);
+        knobColour.brighter(0.3f), cx - innerRadius * 0.5f, cy - innerRadius * 0.5f,
+        knobColour.darker(0.2f), cx + innerRadius * 0.5f, cy + innerRadius * 0.5f, true);
     g.setGradientFill(knobGradient);
     g.fillEllipse(cx - innerRadius, cy - innerRadius, innerRadius * 2.0f, innerRadius * 2.0f);
 
-    // Inner ring
-    g.setColour(juce::Colour(0xFF718096));
-    g.drawEllipse(cx - innerRadius, cy - innerRadius, innerRadius * 2.0f, innerRadius * 2.0f, 1.0f);
+    // Inner ring highlight
+    g.setColour(knobColour.brighter(0.4f).withAlpha(0.5f));
+    g.drawEllipse(cx - innerRadius + 1, cy - innerRadius + 1, (innerRadius - 1) * 2.0f, (innerRadius - 1) * 2.0f, 1.0f);
 
-    // Pointer (chicken head style)
-    float pointerAngle = juce::jmap(sliderPosProportional, 0.0f, 1.0f, -2.356f, 2.356f) + juce::MathConstants<float>::pi;
-    float pointerLength = innerRadius * 0.7f;
+    // Pointer angle calculation
+    float pointerAngle = juce::jmap(sliderPosProportional, 0.0f, 1.0f, -2.4f, 2.4f) + juce::MathConstants<float>::pi;
 
-    // Draw pointer triangle
-    juce::Path pointer;
-    float tipX = cx + pointerLength * std::cos(pointerAngle);
-    float tipY = cy + pointerLength * std::sin(pointerAngle);
-    float baseWidth = innerRadius * 0.25f;
-    float perpAngle = pointerAngle + juce::MathConstants<float>::halfPi;
-    float base1X = cx + baseWidth * std::cos(perpAngle);
-    float base1Y = cy + baseWidth * std::sin(perpAngle);
-    float base2X = cx - baseWidth * std::cos(perpAngle);
-    float base2Y = cy - baseWidth * std::sin(perpAngle);
+    if (isChickenHead)
+    {
+        // CHICKEN HEAD pointer style
+        float pointerLength = innerRadius * 0.85f;
+        float baseWidth = innerRadius * 0.35f;
+        float perpAngle = pointerAngle + juce::MathConstants<float>::halfPi;
 
-    pointer.startNewSubPath(tipX, tipY);
-    pointer.lineTo(base1X, base1Y);
-    pointer.lineTo(base2X, base2Y);
-    pointer.closeSubPath();
+        juce::Path pointer;
+        float tipX = cx + pointerLength * std::cos(pointerAngle);
+        float tipY = cy + pointerLength * std::sin(pointerAngle);
+        float base1X = cx + baseWidth * std::cos(perpAngle);
+        float base1Y = cy + baseWidth * std::sin(perpAngle);
+        float base2X = cx - baseWidth * std::cos(perpAngle);
+        float base2Y = cy - baseWidth * std::sin(perpAngle);
 
-    g.setColour(knobColour);
-    g.fillPath(pointer);
+        pointer.startNewSubPath(tipX, tipY);
+        pointer.lineTo(base1X, base1Y);
+        pointer.lineTo(base2X, base2Y);
+        pointer.closeSubPath();
 
-    // Center dot
-    float dotRadius = innerRadius * 0.15f;
-    g.setColour(juce::Colour(0xFF1A202C));
-    g.fillEllipse(cx - dotRadius, cy - dotRadius, dotRadius * 2.0f, dotRadius * 2.0f);
+        // Pointer shadow
+        g.setColour(juce::Colour(0x40000000));
+        g.fillPath(pointer, juce::AffineTransform::translation(1.0f, 1.0f));
+
+        // Main pointer
+        g.setColour(knobColour.darker(0.1f));
+        g.fillPath(pointer);
+
+        // Pointer highlight edge
+        g.setColour(knobColour.brighter(0.2f));
+        g.strokePath(pointer, juce::PathStrokeType(0.5f));
+    }
+    else
+    {
+        // Simple line indicator
+        float lineLength = innerRadius * 0.7f;
+        float lineStartRadius = innerRadius * 0.2f;
+        g.setColour(juce::Colour(0xFF202020));
+        g.drawLine(
+            cx + lineStartRadius * std::cos(pointerAngle),
+            cy + lineStartRadius * std::sin(pointerAngle),
+            cx + lineLength * std::cos(pointerAngle),
+            cy + lineLength * std::sin(pointerAngle),
+            2.5f);
+    }
+
+    // Center cap screw
+    float capRadius = innerRadius * 0.22f;
+    juce::ColourGradient capGradient(
+        juce::Colour(0xFF606870), cx - capRadius, cy - capRadius,
+        juce::Colour(0xFF303840), cx + capRadius, cy + capRadius, true);
+    g.setGradientFill(capGradient);
+    g.fillEllipse(cx - capRadius, cy - capRadius, capRadius * 2.0f, capRadius * 2.0f);
+
+    // Screw slot
+    g.setColour(juce::Colour(0xFF202020));
+    g.drawLine(cx - capRadius * 0.6f, cy, cx + capRadius * 0.6f, cy, 1.5f);
 }
 
 void NeveLookAndFeel::drawToggleButton(juce::Graphics& g, juce::ToggleButton& button,
-                                        bool /*shouldDrawButtonAsHighlighted*/,
+                                        bool shouldDrawButtonAsHighlighted,
                                         bool /*shouldDrawButtonAsDown*/)
 {
-    auto bounds = button.getLocalBounds().toFloat().reduced(2.0f);
+    auto bounds = button.getLocalBounds().toFloat().reduced(1.0f);
 
-    // Button background
-    g.setColour(button.getToggleState() ? juce::Colour(0xFFED8936) : juce::Colour(0xFF2D3748));
-    g.fillRoundedRectangle(bounds, 4.0f);
+    // Button shadow
+    g.setColour(juce::Colour(0x40000000));
+    g.fillRoundedRectangle(bounds.translated(1, 1), 3.0f);
+
+    // Button background with beveled look
+    juce::Colour bgColour = button.getToggleState()
+        ? juce::Colour(0xFFE67E22)  // Orange when on
+        : juce::Colour(0xFF3D4A56); // Dark blue-grey when off
+
+    if (shouldDrawButtonAsHighlighted)
+        bgColour = bgColour.brighter(0.1f);
+
+    juce::ColourGradient btnGradient(
+        bgColour.brighter(0.15f), bounds.getX(), bounds.getY(),
+        bgColour.darker(0.1f), bounds.getX(), bounds.getBottom(), false);
+    g.setGradientFill(btnGradient);
+    g.fillRoundedRectangle(bounds, 3.0f);
 
     // Border
-    g.setColour(juce::Colour(0xFF4A5568));
-    g.drawRoundedRectangle(bounds, 4.0f, 1.0f);
+    g.setColour(juce::Colour(0xFF2A3440));
+    g.drawRoundedRectangle(bounds, 3.0f, 1.0f);
+
+    // Top highlight
+    g.setColour(juce::Colour(0x30FFFFFF));
+    g.drawLine(bounds.getX() + 3, bounds.getY() + 1, bounds.getRight() - 3, bounds.getY() + 1, 1.0f);
 
     // Text
-    g.setColour(button.getToggleState() ? juce::Colour(0xFF1A202C) : juce::Colour(0xFFF7FAFC));
-    g.setFont(juce::Font(11.0f, juce::Font::bold));
+    g.setColour(button.getToggleState() ? juce::Colour(0xFF1A1A1A) : juce::Colour(0xFFF5F0E6));
+    g.setFont(juce::Font(10.0f, juce::Font::bold));
     g.drawText(button.getButtonText(), bounds, juce::Justification::centred);
 }
 
@@ -113,33 +173,42 @@ void NeveLookAndFeel::drawComboBox(juce::Graphics& g, int width, int height, boo
 {
     auto bounds = juce::Rectangle<float>(0, 0, (float)width, (float)height);
 
-    g.setColour(juce::Colour(0xFF2D3748));
-    g.fillRoundedRectangle(bounds, 4.0f);
+    // Shadow
+    g.setColour(juce::Colour(0x40000000));
+    g.fillRoundedRectangle(bounds.translated(1, 1), 3.0f);
 
-    g.setColour(juce::Colour(0xFF4A5568));
-    g.drawRoundedRectangle(bounds, 4.0f, 1.0f);
+    // Background gradient
+    juce::ColourGradient bgGradient(
+        juce::Colour(0xFF4A5666), 0, 0,
+        juce::Colour(0xFF3D4A56), 0, (float)height, false);
+    g.setGradientFill(bgGradient);
+    g.fillRoundedRectangle(bounds, 3.0f);
+
+    // Border
+    g.setColour(juce::Colour(0xFF2A3440));
+    g.drawRoundedRectangle(bounds, 3.0f, 1.0f);
 
     // Arrow
     juce::Path arrow;
-    float arrowX = width - 15.0f;
+    float arrowX = width - 12.0f;
     float arrowY = height * 0.5f;
     arrow.addTriangle(arrowX - 4.0f, arrowY - 2.0f, arrowX + 4.0f, arrowY - 2.0f, arrowX, arrowY + 3.0f);
-    g.setColour(juce::Colour(0xFFF7FAFC));
+    g.setColour(juce::Colour(0xFFF5F0E6));
     g.fillPath(arrow);
 }
 
 juce::Font NeveLookAndFeel::getComboBoxFont(juce::ComboBox& /*box*/)
 {
-    return juce::Font(12.0f);
+    return juce::Font(10.0f);
 }
 
 juce::Font NeveLookAndFeel::getLabelFont(juce::Label& /*label*/)
 {
-    return juce::Font(11.0f, juce::Font::bold);
+    return juce::Font(10.0f, juce::Font::bold);
 }
 
 //==============================================================================
-// VUMeter
+// VUMeter - Classic Analog Style
 //==============================================================================
 VUMeter::VUMeter()
 {
@@ -159,18 +228,23 @@ void VUMeter::setGainReduction(float gr)
 
 void VUMeter::paint(juce::Graphics& g)
 {
-    auto bounds = getLocalBounds().toFloat().reduced(2.0f);
+    auto bounds = getLocalBounds().toFloat().reduced(1.0f);
 
-    // Background
-    g.setColour(juce::Colour(0xFF1A202C));
-    g.fillRoundedRectangle(bounds, 3.0f);
+    // Outer bezel
+    g.setColour(juce::Colour(0xFF2A3440));
+    g.fillRoundedRectangle(bounds, 4.0f);
+
+    // Inner meter area
+    auto meterBounds = bounds.reduced(3.0f);
+    g.setColour(juce::Colour(0xFF1A1F26));
+    g.fillRoundedRectangle(meterBounds, 2.0f);
 
     // Meter value
     float displayValue = showGR ? gainReduction : level;
 
     // Smooth the display
     float targetSmoothed = showGR ? smoothedGR : smoothedLevel;
-    targetSmoothed += 0.3f * (displayValue - targetSmoothed);
+    targetSmoothed += 0.25f * (displayValue - targetSmoothed);
     if (showGR)
         smoothedGR = targetSmoothed;
     else
@@ -180,50 +254,69 @@ void VUMeter::paint(juce::Graphics& g)
     float meterHeight;
     if (showGR)
     {
-        // GR meter: 0-20dB range
         meterHeight = std::min(1.0f, smoothedGR / 20.0f);
     }
     else
     {
-        // Level meter: -60 to 0dB range, displayed as linear
         float dbLevel = 20.0f * std::log10(std::max(0.0001f, smoothedLevel));
         meterHeight = std::max(0.0f, (dbLevel + 60.0f) / 60.0f);
     }
 
-    // Draw meter bar
-    auto meterBounds = bounds.reduced(3.0f);
-    float barHeight = meterBounds.getHeight() * meterHeight;
+    // Draw meter bar with segments
+    auto barBounds = meterBounds.reduced(2.0f);
+    int numSegments = 12;
+    float segmentHeight = barBounds.getHeight() / numSegments;
+    float segmentGap = 1.0f;
 
-    if (showGR)
+    for (int i = 0; i < numSegments; ++i)
     {
-        // GR meter - draw from top
-        g.setColour(juce::Colour(0xFFE53E3E));
-        g.fillRect(meterBounds.getX(), meterBounds.getY(),
-                   meterBounds.getWidth(), barHeight);
-    }
-    else
-    {
-        // Level meter - draw from bottom
-        juce::ColourGradient gradient(
-            juce::Colour(0xFF48BB78), meterBounds.getX(), meterBounds.getBottom(),
-            juce::Colour(0xFFE53E3E), meterBounds.getX(), meterBounds.getY(), false);
-        gradient.addColour(0.7, juce::Colour(0xFFECC94B));
-        g.setGradientFill(gradient);
-        g.fillRect(meterBounds.getX(), meterBounds.getBottom() - barHeight,
-                   meterBounds.getWidth(), barHeight);
+        float segmentY = barBounds.getBottom() - (i + 1) * segmentHeight;
+        float segmentThreshold = (float)(i + 1) / numSegments;
+
+        if (meterHeight >= segmentThreshold - 0.08f)
+        {
+            juce::Colour segColour;
+            if (showGR)
+            {
+                segColour = juce::Colour(0xFFCC3333);  // Red for GR
+            }
+            else if (i >= 10)
+            {
+                segColour = juce::Colour(0xFFCC3333);  // Red (hot)
+            }
+            else if (i >= 8)
+            {
+                segColour = juce::Colour(0xFFE6A822);  // Amber
+            }
+            else
+            {
+                segColour = juce::Colour(0xFF44AA44);  // Green
+            }
+
+            g.setColour(segColour);
+            g.fillRect(barBounds.getX(), segmentY + segmentGap,
+                       barBounds.getWidth(), segmentHeight - segmentGap * 2);
+        }
+        else
+        {
+            // Dim segment
+            g.setColour(juce::Colour(0xFF252A30));
+            g.fillRect(barBounds.getX(), segmentY + segmentGap,
+                       barBounds.getWidth(), segmentHeight - segmentGap * 2);
+        }
     }
 
-    // Scale marks
-    g.setColour(juce::Colour(0xFF4A5568));
-    for (int i = 0; i <= 4; ++i)
+    // Scale marks on right side
+    g.setColour(juce::Colour(0xFF606870));
+    for (int i = 0; i <= numSegments; i += 3)
     {
-        float y = meterBounds.getY() + (meterBounds.getHeight() * i / 4.0f);
-        g.drawHorizontalLine((int)y, meterBounds.getX(), meterBounds.getRight());
+        float y = barBounds.getBottom() - i * segmentHeight;
+        g.drawHorizontalLine((int)y, barBounds.getRight() - 3, barBounds.getRight());
     }
 }
 
 //==============================================================================
-// SectionHeader
+// SectionHeader - Metal Strip Style
 //==============================================================================
 SectionHeader::SectionHeader(const juce::String& t) : title(t)
 {
@@ -233,25 +326,43 @@ void SectionHeader::paint(juce::Graphics& g)
 {
     auto bounds = getLocalBounds().toFloat();
 
-    // Background stripe
-    g.setColour(juce::Colour(0xFF2D3748));
+    // Metal strip gradient
+    juce::ColourGradient stripGradient(
+        juce::Colour(0xFF5B6B7A), 0, bounds.getY(),
+        juce::Colour(0xFF3D4A56), 0, bounds.getBottom(), false);
+    g.setGradientFill(stripGradient);
     g.fillRect(bounds);
 
-    // Text
-    g.setColour(juce::Colour(0xFFED8936));
-    g.setFont(juce::Font(13.0f, juce::Font::bold));
-    g.drawText(title, bounds.reduced(8.0f, 0.0f), juce::Justification::centredLeft);
+    // Top highlight
+    g.setColour(juce::Colour(0xFF7A8A99));
+    g.drawHorizontalLine((int)bounds.getY(), bounds.getX(), bounds.getRight());
+
+    // Bottom shadow
+    g.setColour(juce::Colour(0xFF2A3440));
+    g.drawHorizontalLine((int)bounds.getBottom() - 1, bounds.getX(), bounds.getRight());
+
+    // Text with embossed look
+    g.setFont(juce::Font(11.0f, juce::Font::bold));
+
+    // Shadow
+    g.setColour(juce::Colour(0xFF2A3440));
+    g.drawText(title, bounds.translated(1, 1).reduced(8.0f, 0.0f), juce::Justification::centred);
+
+    // Main text
+    g.setColour(juce::Colour(0xFFD4A84B));  // Gold lettering
+    g.drawText(title, bounds.reduced(8.0f, 0.0f), juce::Justification::centred);
 }
 
 //==============================================================================
-// NeveStripAudioProcessorEditor
+// NeveStripAudioProcessorEditor - Vertical Channel Strip Layout
 //==============================================================================
 NeveStripAudioProcessorEditor::NeveStripAudioProcessorEditor(NeveStripAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p)
 {
-    setSize(800, 500);
+    setSize(stripWidth, stripHeight);
 
     orangeKnobLookAndFeel.setKnobColour(juce::Colour(neveOrange));
+    redKnobLookAndFeel.setKnobColour(juce::Colour(neveRed));
 
     // Setup all components
     addAndMakeVisible(preampHeader);
@@ -259,7 +370,7 @@ NeveStripAudioProcessorEditor::NeveStripAudioProcessorEditor(NeveStripAudioProce
     addAndMakeVisible(dynamicsHeader);
     addAndMakeVisible(outputHeader);
 
-    // Preamp section
+    // === PREAMP/INPUT SECTION ===
     setupSlider(inputGainSlider, inputGainLabel);
     inputGainSlider.setLookAndFeel(&orangeKnobLookAndFeel);
     setupSlider(outputTrimSlider, outputTrimLabel);
@@ -272,22 +383,27 @@ NeveStripAudioProcessorEditor::NeveStripAudioProcessorEditor(NeveStripAudioProce
     phaseButton.setLookAndFeel(&neveLookAndFeel);
     addAndMakeVisible(phaseButton);
 
-    // EQ section
+    // === EQ SECTION ===
     setupComboBox(hfFreqCombo);
     setupSlider(hfGainSlider, hfLabel);
+    hfGainSlider.setLookAndFeel(&redKnobLookAndFeel);
+
     setupComboBox(hmFreqCombo);
     setupSlider(hmGainSlider, hmLabel);
+
     setupComboBox(lmFreqCombo);
     setupSlider(lmGainSlider, lmLabel);
+
     setupComboBox(lfFreqCombo);
     setupSlider(lfGainSlider, lfLabel);
+    lfGainSlider.setLookAndFeel(&redKnobLookAndFeel);
 
     eqBypassButton.setLookAndFeel(&neveLookAndFeel);
     eqPrePostButton.setLookAndFeel(&neveLookAndFeel);
     addAndMakeVisible(eqBypassButton);
     addAndMakeVisible(eqPrePostButton);
 
-    // Dynamics section
+    // === DYNAMICS SECTION ===
     setupSlider(compThresholdSlider, compThreshLabel);
     setupComboBox(compRatioCombo);
     addAndMakeVisible(compRatioLabel);
@@ -312,7 +428,7 @@ NeveStripAudioProcessorEditor::NeveStripAudioProcessorEditor(NeveStripAudioProce
     limBypassButton.setLookAndFeel(&neveLookAndFeel);
     addAndMakeVisible(limBypassButton);
 
-    // Output section
+    // === OUTPUT SECTION ===
     setupSlider(outputLevelSlider, outputLabel);
     outputLevelSlider.setLookAndFeel(&orangeKnobLookAndFeel);
     masterBypassButton.setLookAndFeel(&neveLookAndFeel);
@@ -430,7 +546,7 @@ void NeveStripAudioProcessorEditor::setupSlider(juce::Slider& slider, juce::Labe
     addAndMakeVisible(slider);
 
     label.setJustificationType(juce::Justification::centred);
-    label.setFont(juce::Font(11.0f, juce::Font::bold));
+    label.setFont(juce::Font(10.0f, juce::Font::bold));
     addAndMakeVisible(label);
 }
 
@@ -442,211 +558,236 @@ void NeveStripAudioProcessorEditor::setupComboBox(juce::ComboBox& combo)
 
 void NeveStripAudioProcessorEditor::paint(juce::Graphics& g)
 {
-    // Main background - Neve blue-grey
-    g.fillAll(juce::Colour(neveBlueGrey));
+    auto bounds = getLocalBounds();
 
-    // Metal texture effect
+    // Main faceplate - classic Neve blue-grey metal
+    juce::ColourGradient bgGradient(
+        juce::Colour(neveMetalLight), 0, 0,
+        juce::Colour(neveBlueGrey), 0, (float)getHeight(), false);
+    g.setGradientFill(bgGradient);
+    g.fillRect(bounds);
+
+    // Brushed metal texture (horizontal lines)
+    g.setColour(juce::Colour(neveBlueGrey).brighter(0.03f));
     for (int i = 0; i < getHeight(); i += 2)
     {
-        g.setColour(juce::Colour(neveBlueGrey).brighter(0.02f));
         g.drawHorizontalLine(i, 0.0f, (float)getWidth());
     }
 
-    // Top banner
-    g.setColour(juce::Colour(neveDarkGrey));
-    g.fillRect(0, 0, getWidth(), 40);
+    // Left edge shadow
+    g.setColour(juce::Colour(0x30000000));
+    g.fillRect(0, 0, 3, getHeight());
+
+    // Right edge highlight
+    g.setColour(juce::Colour(0x20FFFFFF));
+    g.fillRect(getWidth() - 3, 0, 3, getHeight());
+
+    // Rack mount holes (top)
+    drawRackScrew(g, 12, 8);
+    drawRackScrew(g, getWidth() - 12, 8);
+
+    // Rack mount holes (bottom)
+    drawRackScrew(g, 12, getHeight() - 8);
+    drawRackScrew(g, getWidth() - 12, getHeight() - 8);
+
+    // Top banner area
+    g.setColour(juce::Colour(neveDarkBlue));
+    g.fillRect(0, 18, getWidth(), 32);
+
+    // Banner bevels
+    g.setColour(juce::Colour(neveMetalLight));
+    g.drawHorizontalLine(18, 0, (float)getWidth());
+    g.setColour(juce::Colour(0xFF2A3440));
+    g.drawHorizontalLine(49, 0, (float)getWidth());
 
     // Logo/Title
-    g.setColour(juce::Colour(neveOrange));
-    g.setFont(juce::Font(24.0f, juce::Font::bold));
-    g.drawText("NEVESTRIP", 20, 5, 200, 30, juce::Justification::centredLeft);
+    g.setFont(juce::Font(20.0f, juce::Font::bold));
+    g.setColour(juce::Colour(0xFF2A3440));  // Shadow
+    g.drawText("NEVESTRIP", 0, 22, getWidth(), 24, juce::Justification::centred);
+    g.setColour(juce::Colour(neveGold));
+    g.drawText("NEVESTRIP", 0, 21, getWidth(), 24, juce::Justification::centred);
 
-    g.setColour(juce::Colour(neveCream));
-    g.setFont(juce::Font(12.0f));
-    g.drawText("Channel Strip", 20, 25, 200, 15, juce::Justification::centredLeft);
+    // Meters area background on right side
+    int meterAreaX = getWidth() - 70;
+    g.setColour(juce::Colour(neveDarkBlue).withAlpha(0.5f));
+    g.fillRect(meterAreaX - 5, 55, 75, getHeight() - 70);
+}
 
-    // Section dividers
-    g.setColour(juce::Colour(0xFF1A202C));
-    g.drawVerticalLine(165, 45.0f, (float)getHeight() - 5);
-    g.drawVerticalLine(430, 45.0f, (float)getHeight() - 5);
-    g.drawVerticalLine(635, 45.0f, (float)getHeight() - 5);
+void NeveStripAudioProcessorEditor::drawRackScrew(juce::Graphics& g, int x, int y)
+{
+    float radius = 5.0f;
+
+    // Screw hole shadow
+    g.setColour(juce::Colour(0xFF2A3440));
+    g.fillEllipse((float)x - radius - 1, (float)y - radius - 1, radius * 2 + 2, radius * 2 + 2);
+
+    // Screw head
+    juce::ColourGradient screwGradient(
+        juce::Colour(0xFFB0B8C0), (float)x - radius, (float)y - radius,
+        juce::Colour(0xFF707880), (float)x + radius, (float)y + radius, true);
+    g.setGradientFill(screwGradient);
+    g.fillEllipse((float)x - radius, (float)y - radius, radius * 2, radius * 2);
+
+    // Phillips head slot
+    g.setColour(juce::Colour(0xFF404850));
+    g.drawLine((float)x - 3, (float)y, (float)x + 3, (float)y, 1.5f);
+    g.drawLine((float)x, (float)y - 3, (float)x, (float)y + 3, 1.5f);
 }
 
 void NeveStripAudioProcessorEditor::resized()
 {
     auto bounds = getLocalBounds();
-
-    // Top banner
-    bounds.removeFromTop(45);
-
-    // Split into sections
-    auto preampArea = bounds.removeFromLeft(160);
-    auto eqArea = bounds.removeFromLeft(260);
-    auto dynamicsArea = bounds.removeFromLeft(200);
-    auto outputArea = bounds;
-
-    int headerHeight = 22;
-    int knobSize = 55;
-    int labelHeight = 16;
-    int comboHeight = 22;
-    int buttonHeight = 24;
     int margin = 8;
+    int smallMargin = 4;
+    int comboHeight = 20;
+    int buttonHeight = 22;
+    int currentY = 55;
 
-    // === PREAMP SECTION ===
-    preampHeader.setBounds(preampArea.removeFromTop(headerHeight));
-    preampArea.reduce(margin, margin);
+    // Meter area on right side
+    int meterAreaWidth = 65;
+    int meterWidth = 18;
+    int meterHeight = 100;
+    int controlAreaWidth = getWidth() - meterAreaWidth - margin;
 
-    auto inputRow = preampArea.removeFromTop(knobSize + labelHeight);
-    inputGainLabel.setBounds(inputRow.removeFromTop(labelHeight));
-    inputGainSlider.setBounds(inputRow.withSizeKeepingCentre(knobSize, knobSize));
+    // === INPUT/PREAMP SECTION ===
+    preampHeader.setBounds(0, currentY, controlAreaWidth, headerHeight);
+    currentY += headerHeight + smallMargin;
 
-    preampArea.removeFromTop(margin);
+    // Row 1: Input Gain (large, centered)
+    auto inputArea = juce::Rectangle<int>(margin, currentY, controlAreaWidth - margin * 2, knobSize + labelHeight);
+    inputGainLabel.setBounds(inputArea.removeFromTop(labelHeight));
+    inputGainSlider.setBounds(inputArea.withSizeKeepingCentre(knobSize, knobSize));
+    currentY += knobSize + labelHeight + smallMargin;
 
-    auto trimRow = preampArea.removeFromTop(knobSize + labelHeight);
-    outputTrimLabel.setBounds(trimRow.removeFromTop(labelHeight));
-    outputTrimSlider.setBounds(trimRow.withSizeKeepingCentre(knobSize, knobSize));
+    // Row 2: Trim and Drive side by side
+    int halfWidth = (controlAreaWidth - margin * 3) / 2;
+    auto trimArea = juce::Rectangle<int>(margin, currentY, halfWidth, smallKnobSize + labelHeight);
+    outputTrimLabel.setBounds(trimArea.removeFromTop(labelHeight));
+    outputTrimSlider.setBounds(trimArea.withSizeKeepingCentre(smallKnobSize, smallKnobSize));
 
-    preampArea.removeFromTop(margin);
+    auto driveArea = juce::Rectangle<int>(margin * 2 + halfWidth, currentY, halfWidth, smallKnobSize + labelHeight);
+    transformerLabel.setBounds(driveArea.removeFromTop(labelHeight));
+    transformerDriveSlider.setBounds(driveArea.withSizeKeepingCentre(smallKnobSize, smallKnobSize));
+    currentY += smallKnobSize + labelHeight + smallMargin;
 
-    auto driveRow = preampArea.removeFromTop(knobSize + labelHeight);
-    transformerLabel.setBounds(driveRow.removeFromTop(labelHeight));
-    transformerDriveSlider.setBounds(driveRow.withSizeKeepingCentre(knobSize, knobSize));
-
-    preampArea.removeFromTop(margin);
-
-    hpfLabel.setBounds(preampArea.removeFromTop(labelHeight));
-    hpfCombo.setBounds(preampArea.removeFromTop(comboHeight).reduced(10, 0));
-
-    preampArea.removeFromTop(margin);
-    phaseButton.setBounds(preampArea.removeFromTop(buttonHeight).reduced(10, 0));
+    // Row 3: HPF and Phase
+    hpfLabel.setBounds(margin, currentY, halfWidth, labelHeight);
+    phaseButton.setBounds(margin * 2 + halfWidth, currentY, halfWidth, buttonHeight);
+    currentY += labelHeight;
+    hpfCombo.setBounds(margin, currentY, halfWidth, comboHeight);
+    currentY += comboHeight + sectionPadding;
 
     // === EQ SECTION ===
-    eqHeader.setBounds(eqArea.removeFromTop(headerHeight));
-    eqArea.reduce(margin, margin);
+    eqHeader.setBounds(0, currentY, controlAreaWidth, headerHeight);
+    currentY += headerHeight + smallMargin;
 
-    // Two columns for EQ
-    int eqColWidth = eqArea.getWidth() / 2;
+    // EQ bands in 2x2 grid
+    int eqKnobSize = 44;
+    int eqColWidth = (controlAreaWidth - margin * 3) / 2;
+    int eqRowHeight = eqKnobSize + labelHeight + comboHeight + 2;
 
-    // Left column: HF, HM
-    auto eqLeft = eqArea.removeFromLeft(eqColWidth);
-    // Right column: LM, LF
-    auto eqRight = eqArea;
+    // HF (top left)
+    auto hfArea = juce::Rectangle<int>(margin, currentY, eqColWidth, eqRowHeight);
+    hfLabel.setBounds(hfArea.removeFromTop(labelHeight));
+    hfFreqCombo.setBounds(hfArea.removeFromTop(comboHeight).reduced(2, 0));
+    hfGainSlider.setBounds(hfArea.withSizeKeepingCentre(eqKnobSize, eqKnobSize));
 
-    // HF
-    auto hfRow = eqLeft.removeFromTop(knobSize + labelHeight + comboHeight + 4);
-    hfLabel.setBounds(hfRow.removeFromTop(labelHeight));
-    hfFreqCombo.setBounds(hfRow.removeFromTop(comboHeight).reduced(5, 0));
-    hfGainSlider.setBounds(hfRow.withSizeKeepingCentre(knobSize, knobSize));
+    // HM (top right)
+    auto hmArea = juce::Rectangle<int>(margin * 2 + eqColWidth, currentY, eqColWidth, eqRowHeight);
+    hmLabel.setBounds(hmArea.removeFromTop(labelHeight));
+    hmFreqCombo.setBounds(hmArea.removeFromTop(comboHeight).reduced(2, 0));
+    hmGainSlider.setBounds(hmArea.withSizeKeepingCentre(eqKnobSize, eqKnobSize));
 
-    eqLeft.removeFromTop(margin);
+    currentY += eqRowHeight + 2;
 
-    // HM
-    auto hmRow = eqLeft.removeFromTop(knobSize + labelHeight + comboHeight + 4);
-    hmLabel.setBounds(hmRow.removeFromTop(labelHeight));
-    hmFreqCombo.setBounds(hmRow.removeFromTop(comboHeight).reduced(5, 0));
-    hmGainSlider.setBounds(hmRow.withSizeKeepingCentre(knobSize, knobSize));
+    // LM (bottom left)
+    auto lmArea = juce::Rectangle<int>(margin, currentY, eqColWidth, eqRowHeight);
+    lmLabel.setBounds(lmArea.removeFromTop(labelHeight));
+    lmFreqCombo.setBounds(lmArea.removeFromTop(comboHeight).reduced(2, 0));
+    lmGainSlider.setBounds(lmArea.withSizeKeepingCentre(eqKnobSize, eqKnobSize));
 
-    // LM
-    auto lmRow = eqRight.removeFromTop(knobSize + labelHeight + comboHeight + 4);
-    lmLabel.setBounds(lmRow.removeFromTop(labelHeight));
-    lmFreqCombo.setBounds(lmRow.removeFromTop(comboHeight).reduced(5, 0));
-    lmGainSlider.setBounds(lmRow.withSizeKeepingCentre(knobSize, knobSize));
+    // LF (bottom right)
+    auto lfArea = juce::Rectangle<int>(margin * 2 + eqColWidth, currentY, eqColWidth, eqRowHeight);
+    lfLabel.setBounds(lfArea.removeFromTop(labelHeight));
+    lfFreqCombo.setBounds(lfArea.removeFromTop(comboHeight).reduced(2, 0));
+    lfGainSlider.setBounds(lfArea.withSizeKeepingCentre(eqKnobSize, eqKnobSize));
 
-    eqRight.removeFromTop(margin);
+    currentY += eqRowHeight + 2;
 
-    // LF
-    auto lfRow = eqRight.removeFromTop(knobSize + labelHeight + comboHeight + 4);
-    lfLabel.setBounds(lfRow.removeFromTop(labelHeight));
-    lfFreqCombo.setBounds(lfRow.removeFromTop(comboHeight).reduced(5, 0));
-    lfGainSlider.setBounds(lfRow.withSizeKeepingCentre(knobSize, knobSize));
-
-    // EQ buttons at bottom of left column
-    eqLeft.removeFromTop(margin);
-    auto eqButtonRow = eqLeft.removeFromTop(buttonHeight);
-    eqBypassButton.setBounds(eqButtonRow.removeFromLeft(eqButtonRow.getWidth() / 2).reduced(2, 0));
-    eqPrePostButton.setBounds(eqButtonRow.reduced(2, 0));
+    // EQ buttons
+    eqBypassButton.setBounds(margin, currentY, eqColWidth, buttonHeight);
+    eqPrePostButton.setBounds(margin * 2 + eqColWidth, currentY, eqColWidth, buttonHeight);
+    currentY += buttonHeight + sectionPadding;
 
     // === DYNAMICS SECTION ===
-    dynamicsHeader.setBounds(dynamicsArea.removeFromTop(headerHeight));
-    dynamicsArea.reduce(margin, margin);
+    dynamicsHeader.setBounds(0, currentY, controlAreaWidth, headerHeight);
+    currentY += headerHeight + smallMargin;
 
-    // Threshold
-    auto threshRow = dynamicsArea.removeFromTop(knobSize + labelHeight);
-    compThreshLabel.setBounds(threshRow.removeFromTop(labelHeight));
-    compThresholdSlider.setBounds(threshRow.withSizeKeepingCentre(knobSize, knobSize));
+    // Compressor: Threshold and Makeup knobs
+    int dynKnobSize = 44;
+    auto threshArea = juce::Rectangle<int>(margin, currentY, halfWidth, dynKnobSize + labelHeight);
+    compThreshLabel.setBounds(threshArea.removeFromTop(labelHeight));
+    compThresholdSlider.setBounds(threshArea.withSizeKeepingCentre(dynKnobSize, dynKnobSize));
 
-    dynamicsArea.removeFromTop(4);
+    auto makeupArea = juce::Rectangle<int>(margin * 2 + halfWidth, currentY, halfWidth, dynKnobSize + labelHeight);
+    compMakeupLabel.setBounds(makeupArea.removeFromTop(labelHeight));
+    compMakeupSlider.setBounds(makeupArea.withSizeKeepingCentre(dynKnobSize, dynKnobSize));
+    currentY += dynKnobSize + labelHeight + 2;
 
-    // Ratio
-    compRatioLabel.setBounds(dynamicsArea.removeFromTop(labelHeight));
-    compRatioCombo.setBounds(dynamicsArea.removeFromTop(comboHeight).reduced(10, 0));
+    // Ratio, Attack, Release in a row
+    int thirdWidth = (controlAreaWidth - margin * 4) / 3;
+    compRatioLabel.setBounds(margin, currentY, thirdWidth, labelHeight);
+    compAttackLabel.setBounds(margin * 2 + thirdWidth, currentY, thirdWidth, labelHeight);
+    compReleaseLabel.setBounds(margin * 3 + thirdWidth * 2, currentY, thirdWidth, labelHeight);
+    currentY += labelHeight;
 
-    dynamicsArea.removeFromTop(4);
-
-    // Attack
-    compAttackLabel.setBounds(dynamicsArea.removeFromTop(labelHeight));
-    compAttackCombo.setBounds(dynamicsArea.removeFromTop(comboHeight).reduced(10, 0));
-
-    dynamicsArea.removeFromTop(4);
-
-    // Release
-    compReleaseLabel.setBounds(dynamicsArea.removeFromTop(labelHeight));
-    compReleaseCombo.setBounds(dynamicsArea.removeFromTop(comboHeight).reduced(10, 0));
-
-    dynamicsArea.removeFromTop(4);
-
-    // Makeup
-    auto makeupRow = dynamicsArea.removeFromTop(knobSize + labelHeight);
-    compMakeupLabel.setBounds(makeupRow.removeFromTop(labelHeight));
-    compMakeupSlider.setBounds(makeupRow.withSizeKeepingCentre(knobSize, knobSize));
-
-    dynamicsArea.removeFromTop(4);
+    compRatioCombo.setBounds(margin, currentY, thirdWidth, comboHeight);
+    compAttackCombo.setBounds(margin * 2 + thirdWidth, currentY, thirdWidth, comboHeight);
+    compReleaseCombo.setBounds(margin * 3 + thirdWidth * 2, currentY, thirdWidth, comboHeight);
+    currentY += comboHeight + 2;
 
     // Comp buttons
-    auto compButtonRow = dynamicsArea.removeFromTop(buttonHeight);
-    int btnWidth = compButtonRow.getWidth() / 3;
-    compBypassButton.setBounds(compButtonRow.removeFromLeft(btnWidth).reduced(2, 0));
-    compLinkButton.setBounds(compButtonRow.removeFromLeft(btnWidth).reduced(2, 0));
-    compSCHPFButton.setBounds(compButtonRow.reduced(2, 0));
+    compBypassButton.setBounds(margin, currentY, thirdWidth, buttonHeight);
+    compLinkButton.setBounds(margin * 2 + thirdWidth, currentY, thirdWidth, buttonHeight);
+    compSCHPFButton.setBounds(margin * 3 + thirdWidth * 2, currentY, thirdWidth, buttonHeight);
+    currentY += buttonHeight + smallMargin;
 
-    dynamicsArea.removeFromTop(margin);
-
-    // Limiter
-    limThreshLabel.setBounds(dynamicsArea.removeFromTop(labelHeight));
-    limThresholdSlider.setBounds(dynamicsArea.removeFromTop(knobSize).withSizeKeepingCentre(knobSize, knobSize));
-    limBypassButton.setBounds(dynamicsArea.removeFromTop(buttonHeight).reduced(20, 0));
+    // Limiter row
+    limThreshLabel.setBounds(margin, currentY, halfWidth, labelHeight);
+    currentY += labelHeight;
+    limThresholdSlider.setBounds(margin + (halfWidth - smallKnobSize) / 2, currentY, smallKnobSize, smallKnobSize);
+    limBypassButton.setBounds(margin * 2 + halfWidth, currentY + (smallKnobSize - buttonHeight) / 2, halfWidth, buttonHeight);
+    currentY += smallKnobSize + sectionPadding;
 
     // === OUTPUT SECTION ===
-    outputHeader.setBounds(outputArea.removeFromTop(headerHeight));
-    outputArea.reduce(margin, margin);
+    outputHeader.setBounds(0, currentY, controlAreaWidth, headerHeight);
+    currentY += headerHeight + smallMargin;
 
-    // Output level knob
-    auto outLevelRow = outputArea.removeFromTop(knobSize + labelHeight);
-    outputLabel.setBounds(outLevelRow.removeFromTop(labelHeight));
-    outputLevelSlider.setBounds(outLevelRow.withSizeKeepingCentre(knobSize, knobSize));
-
-    outputArea.removeFromTop(margin);
+    // Output level knob (centered)
+    auto outputArea = juce::Rectangle<int>(margin, currentY, controlAreaWidth - margin * 2, knobSize + labelHeight);
+    outputLabel.setBounds(outputArea.removeFromTop(labelHeight));
+    outputLevelSlider.setBounds(outputArea.withSizeKeepingCentre(knobSize, knobSize));
+    currentY += knobSize + labelHeight + smallMargin;
 
     // Master bypass
-    masterBypassButton.setBounds(outputArea.removeFromTop(buttonHeight).reduced(10, 0));
+    masterBypassButton.setBounds(margin + (controlAreaWidth - margin * 2 - 100) / 2, currentY, 100, buttonHeight);
 
-    outputArea.removeFromTop(margin * 2);
+    // === METERS (Right side) ===
+    int meterStartY = 60;
+    int meterX = getWidth() - meterAreaWidth + 5;
+    int meterSpacing = (getHeight() - meterStartY - 30) / 3;
 
-    // Meters
-    int meterWidth = 25;
-    int meterHeight = 120;
-    auto meterArea = outputArea.removeFromTop(meterHeight + labelHeight);
+    // Input meter
+    inputMeterLabel.setBounds(meterX, meterStartY, meterAreaWidth - 10, labelHeight);
+    inputMeter.setBounds(meterX + (meterAreaWidth - 10 - meterWidth) / 2, meterStartY + labelHeight, meterWidth, meterHeight);
 
-    auto inMeterArea = meterArea.removeFromLeft(meterArea.getWidth() / 3);
-    inputMeterLabel.setBounds(inMeterArea.removeFromTop(labelHeight));
-    inputMeter.setBounds(inMeterArea.withSizeKeepingCentre(meterWidth, meterHeight));
+    // Output meter
+    outputMeterLabel.setBounds(meterX, meterStartY + meterSpacing, meterAreaWidth - 10, labelHeight);
+    outputMeter.setBounds(meterX + (meterAreaWidth - 10 - meterWidth) / 2, meterStartY + meterSpacing + labelHeight, meterWidth, meterHeight);
 
-    auto outMeterArea = meterArea.removeFromLeft(meterArea.getWidth() / 2);
-    outputMeterLabel.setBounds(outMeterArea.removeFromTop(labelHeight));
-    outputMeter.setBounds(outMeterArea.withSizeKeepingCentre(meterWidth, meterHeight));
-
-    grMeterLabel.setBounds(meterArea.removeFromTop(labelHeight));
-    grMeter.setBounds(meterArea.withSizeKeepingCentre(meterWidth, meterHeight));
+    // GR meter
+    grMeterLabel.setBounds(meterX, meterStartY + meterSpacing * 2, meterAreaWidth - 10, labelHeight);
+    grMeter.setBounds(meterX + (meterAreaWidth - 10 - meterWidth) / 2, meterStartY + meterSpacing * 2 + labelHeight, meterWidth, meterHeight);
 }
 
 void NeveStripAudioProcessorEditor::timerCallback()
