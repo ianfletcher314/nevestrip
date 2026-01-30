@@ -35,7 +35,7 @@ private:
 };
 
 //==============================================================================
-// Classic VU Meter Component (Analog Style)
+// Classic VU Meter Component (Analog Style) - Wider with Scale Markings
 //==============================================================================
 class VUMeter : public juce::Component
 {
@@ -52,6 +52,8 @@ private:
     float smoothedLevel = 0.0f;
     float smoothedGR = 0.0f;
     bool showGR = false;
+
+    void drawScaleMarkings(juce::Graphics& g, juce::Rectangle<float> bounds);
 };
 
 //==============================================================================
@@ -68,7 +70,16 @@ private:
 };
 
 //==============================================================================
-// Main Editor - Vertical Channel Strip Layout
+// Scrollable Content Component
+//==============================================================================
+class NeveStripContent : public juce::Component
+{
+public:
+    void paint(juce::Graphics& g) override;
+};
+
+//==============================================================================
+// Main Editor - Vertical Channel Strip Layout with Viewport
 //==============================================================================
 class NeveStripAudioProcessorEditor : public juce::AudioProcessorEditor,
                                        public juce::Timer
@@ -83,6 +94,10 @@ public:
 
 private:
     NeveStripAudioProcessor& audioProcessor;
+
+    // Viewport for scrolling
+    juce::Viewport viewport;
+    NeveStripContent contentComponent;
 
     NeveLookAndFeel neveLookAndFeel;
     NeveLookAndFeel orangeKnobLookAndFeel;
@@ -200,25 +215,32 @@ private:
     void setupSlider(juce::Slider& slider, juce::Label& label);
     void setupComboBox(juce::ComboBox& combo);
     void drawRackScrew(juce::Graphics& g, int x, int y);
+    void drawBrushedMetalTexture(juce::Graphics& g, juce::Rectangle<float> bounds, juce::Colour baseColour);
+    void layoutContent();
 
-    // Classic Neve Colors
-    static constexpr uint32_t neveBlueGrey = 0xFF5B6B7A;      // Classic blue-grey metal
-    static constexpr uint32_t neveDarkBlue = 0xFF3D4A56;      // Darker accent
-    static constexpr uint32_t neveMetalLight = 0xFF7A8A99;    // Light metal highlight
-    static constexpr uint32_t neveOrange = 0xFFE67E22;        // Classic orange
-    static constexpr uint32_t neveRed = 0xFFCC3333;           // Classic red
-    static constexpr uint32_t neveCream = 0xFFF5F0E6;         // Vintage cream
-    static constexpr uint32_t neveGold = 0xFFD4A84B;          // Gold lettering
-    static constexpr uint32_t neveScrewSilver = 0xFFA0A8B0;   // Screw color
+    // Realistic Neve Colors - based on actual hardware
+    static constexpr uint32_t neveBlueGrey = 0xFF6B7B8A;      // Actual brushed steel blue-grey
+    static constexpr uint32_t neveDarkBlue = 0xFF4A5A68;      // Darker steel accent
+    static constexpr uint32_t neveMetalLight = 0xFF8A9AA8;    // Light brushed highlight
+    static constexpr uint32_t neveMetalDark = 0xFF3A4A58;     // Dark shadow
+    static constexpr uint32_t neveOrange = 0xFFD97030;        // Classic Neve orange (more muted)
+    static constexpr uint32_t neveRed = 0xFFA83030;           // Classic red (less saturated)
+    static constexpr uint32_t neveCream = 0xFFE8E0D0;         // Vintage cream (warmer)
+    static constexpr uint32_t neveGold = 0xFFC4983C;          // Engraved gold lettering
+    static constexpr uint32_t neveScrewSilver = 0xFF909898;   // Realistic screw color
 
     // Layout constants for vertical strip
-    static constexpr int stripWidth = 340;
-    static constexpr int stripHeight = 780;
-    static constexpr int knobSize = 50;
-    static constexpr int smallKnobSize = 42;
+    static constexpr int stripWidth = 380;
+    static constexpr int stripHeight = 700;  // Visible height (content can scroll)
+    static constexpr int contentHeight = 820; // Total content height
+    static constexpr int knobSize = 54;
+    static constexpr int smallKnobSize = 44;
     static constexpr int labelHeight = 14;
-    static constexpr int sectionPadding = 6;
-    static constexpr int headerHeight = 20;
+    static constexpr int sectionPadding = 8;
+    static constexpr int headerHeight = 22;
+    static constexpr int meterWidth = 32;     // Wider meters
+    static constexpr int meterHeight = 120;   // Taller meters
+    static constexpr int meterAreaWidth = 90; // More space for meters + labels
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NeveStripAudioProcessorEditor)
 };
